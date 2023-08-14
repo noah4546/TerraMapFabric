@@ -10,10 +10,14 @@ import org.slf4j.LoggerFactory;
 import ca.tnoah.bteterramapfabric.events.KeyHandler;
 
 public class BTETerraMapFabric implements ModInitializer {
+
+	public static final String MODID = "bteterramapfabric";
+	public static final String NAME = "BTE Terra Map Fabric";
+
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("bteterramapfabric");
+    public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	@Override
 	public void onInitialize() {

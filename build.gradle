@@ -67,7 +67,11 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	modImplementation 'com.github.noah4546:TerraPlusMinus:v1.2.2.6'
+	//modImplementation 'com.github.noah4546:TerraPlusMinus:v1.2.2.6'
+
+	implementation 'org.projectlombok:lombok:1.18.26'
+	implementation 'com.github.BuildTheEarth:terraplusplus:f12de26053'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2'
 }
 
 processResources {
