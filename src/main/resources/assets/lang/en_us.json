@@ -1,0 +1,40 @@
+{
+  "key.bteterramapfabric.category": "BTE Terra Map Fabric",
+  "key.bteterramapfabric.options_ui": "Open Options UI",
+  "key.bteterramapfabric.toggle": "Toggle Map Rendering",
+
+  "gui.bteterramapfabric.settings.title": "Map Rendering Options",
+  "gui.bteterramapfabric.settings.map_rendering": "Map Rendering",
+  "gui.bteterramapfabric.settings.enabled": "Enabled",
+  "gui.bteterramapfabric.settings.disabled": "Disabled",
+  "gui.bteterramapfabric.settings.map_type": "Map Type",
+  "gui.bteterramapfabric.settings.map_source": "Map Source",
+  "gui.bteterramapfabric.settings.map_y_level": "Map Y Level",
+  "gui.bteterramapfabric.settings.opacity": "Map Opacity",
+  "gui.bteterramapfabric.settings.zoom": "Map Zoom",
+  "gui.bteterramapfabric.settings.size": "Map Size",
+  "gui.bteterramapfabric.settings.change_map_source": "Change Map Source...",
+
+  "gui.bteterramapfabric.settings.map_align": "Map Alignment",
+  "gui.bteterramapfabric.settings.x_align": "X Axis",
+  "gui.bteterramapfabric.settings.z_align": "Z Axis",
+  "gui.bteterramapfabric.settings.x_align_reset": "Reset X",
+  "gui.bteterramapfabric.settings.z_align_reset": "Reset Z",
+
+  "gui.bteterramapfabric.new_settings.title": "BTE Terra Map Fabric Settings",
+
+  "gui.bteterramapfabric.new_settings.general": "General",
+  "gui.bteterramapfabric.new_settings.map_rendering": "Rendering",
+  "gui.bteterramapfabric.new_settings.map_y_level": "Map Y Level",
+  "gui.bteterramapfabric.new_settings.opacity": "Map Opacity",
+
+  "gui.bteterramapfabric.new_settings.map_source": "Map Source",
+  "gui.bteterramapfabric.new_settings.map_reload": "Reload maps...",
+  "gui.bteterramapfabric.new_settings.map_folder": "Open maps folder...",
+
+  "gui.bteterramapfabric.new_settings.map_offset": "Map Offset",
+  "gui.bteterramapfabric.new_settings.size": "Map Size",
+  "gui.bteterramapfabric.new_settings.zoom": "Map Zoom",
+  "gui.bteterramapfabric.new_settings.lock_north": "Lock North"
+}
+
