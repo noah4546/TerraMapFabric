@@ -1,9 +1,16 @@
 package ca.tnoah.bteterramapfabric;
 
+import ca.tnoah.bteterramapfabric.events.RenderEvent;
+import ca.tnoah.bteterramapfabric.loader.ProjectionYamlLoader;
+import ca.tnoah.bteterramapfabric.loader.TMSYamlLoader;
+import ca.tnoah.bteterramapfabric.projection.Proj4jProjection;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +34,25 @@ public class BTETerraMapFabric implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 
+		try {
+			String modConfigDir = FabricLoader.getInstance().getConfigDir().toString();
+			LOGGER.info(modConfigDir);
+			ProjectionYamlLoader.INSTANCE.refresh(modConfigDir);
+			TMSYamlLoader.INSTANCE.refresh(modConfigDir);
+		} catch (Exception e) {
+			LOGGER.error("Error caught while parsing map yaml files!");
+			LOGGER.error(e.getMessage());
+			throw new RuntimeException(e);
+		}
+
+
 		KeyHandler.initializeKeys();
 		KeyHandler.initializeKeyEvents();
+
+		WorldRenderEvents.START.register(RenderEvent::onRenderEvent);
 	}
 
+	static {
+		Proj4jProjection.registerProjection();
+	}
 }

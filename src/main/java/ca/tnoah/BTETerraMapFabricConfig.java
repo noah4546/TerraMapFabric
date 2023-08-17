@@ -7,7 +7,7 @@ import lombok.Setter;
 public class BTETerraMapFabricConfig {
 
   @Getter @Setter
-  private static boolean isRender = false;
+  public static boolean isRender = false;
 
   public static void mapRenderToggle() {
     isRender = !isRender;
@@ -16,7 +16,6 @@ public class BTETerraMapFabricConfig {
   public static void mapOptionsToggle() {
     MapOptionsSidebar.open();
   }
-
 
 
 }

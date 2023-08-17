@@ -49,7 +49,7 @@ public class MapOptionsSidebar extends Sidebar {
 
   private void initGeneral() {
     renderToggle = new BooleanButton(Default.width, Default.height, "Render", (button, value) -> {
-      System.out.printf("Render: %s\n", value);
+      BTETerraMapFabricConfig.mapRenderToggle();
     });
 
     TextWidget mapLevelLabel = new TextWidget(

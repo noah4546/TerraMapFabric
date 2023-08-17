@@ -49,7 +49,15 @@ repositories {
 		name = "dmulloy2-repo"
 		url = "https://repo.dmulloy2.net/repository/public/"
 	}
-
+	maven {
+		name = 'Ladysnake Mods'
+		url = 'https://maven.ladysnake.org/releases'
+		content {
+			includeGroup 'io.github.ladysnake'
+			includeGroup 'org.ladysnake'
+			includeGroupByRegex 'dev\\.onyxstudios.*'
+		}
+	}
 }
 
 dependencies {
@@ -72,6 +80,8 @@ dependencies {
 	implementation 'org.projectlombok:lombok:1.18.26'
 	implementation 'com.github.BuildTheEarth:terraplusplus:f12de26053'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2'
+	implementation 'org.osgeo:proj4j:0.1.0'
+	include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
 }
 
 processResources {
