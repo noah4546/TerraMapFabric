@@ -59,7 +59,7 @@ public class BTETerraMapFabric implements ModInitializer {
 		WorldRenderEvents.START.register(RenderEvent::onRenderEvent);
 
 		WorldRenderEvents.END.register(context -> {
-			TileRenderer.renderSingleTile(context, new TileRenderer.Plane(0, 0, 16), 64);
+			TileRenderer.renderSingleTile(context, new TileRenderer.Plane(0, 0, 16), 64, 0.5f, null);
 		});
 	}
 

@@ -16,30 +16,34 @@ import static ca.tnoah.bteterramapfabric.BTETerraMapFabric.MODID;
 
 public class TileRenderer {
 
-    public static void renderSingleTile(WorldRenderContext context, Plane p, int yLevel) {
+    public static void renderSingleTile(WorldRenderContext context, Plane p, int yLevel, float opacity, String tmsId) {
 
         MatrixStack matrixStack = getZeroFromCamera(context.camera());
         Tessellator tessellator = Tessellator.getInstance();
 
-        _renderSingleTile(tessellator, matrixStack, p, yLevel);
+        _renderSingleTile(tessellator, matrixStack, p, yLevel, opacity, tmsId);
     }
 
-    private static void _renderSingleTile(Tessellator tessellator, MatrixStack matrixStack, Plane p, int yLevel) {
-        buildPlane(matrixStack, tessellator.getBuffer(), p, yLevel);
+    private static void _renderSingleTile(Tessellator tessellator, MatrixStack matrixStack, Plane p, int yLevel, float opacity, String tmsId) {
+        _renderTile(matrixStack, tessellator.getBuffer(), p, opacity, yLevel);
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
-        RenderSystem.setShaderTexture(0, new Identifier(MODID, "icon.png"));
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
+        if (tmsId == null)
+            RenderSystem.setShaderTexture(0, new Identifier(MODID, "icon.png"));
+
         RenderSystem.disableCull();
+        RenderSystem.enableBlend();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
 
         tessellator.draw();
 
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.enableCull();
+        RenderSystem.disableBlend();
     }
 
-    private static void buildPlane(MatrixStack matrixStack, BufferBuilder buffer, Plane p, int yLevel) {
+    private static void _renderTile(MatrixStack matrixStack, BufferBuilder buffer, Plane p, float opacity, int yLevel) {
         matrixStack.translate(p.x, yLevel, p.z);
         Matrix4f positionMatrix = matrixStack.peek().getPositionMatrix();
 
@@ -52,10 +56,30 @@ public class TileRenderer {
          *  i=3 -------- i=2
          */
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-        buffer.vertex(positionMatrix, 0, 0, 0).color(1f, 0f, 0f, 1f).texture(0f, 0f).next(); // 0
-        buffer.vertex(positionMatrix, p.width, 0, 0).color(0f, 1f, 0f, 1f).texture(1f, 0f).next(); // 1
-        buffer.vertex(positionMatrix, p.width, 0, p.height).color(0f, 0f, 1f, 1f).texture(1f, 1f).next(); // 2
-        buffer.vertex(positionMatrix, 0, 0, p.height).color(1f, 1f, 1f, 1f).texture(0f, 1f).next(); // 3
+
+        // 0
+        buffer.vertex(positionMatrix, 0, 0, 0)
+                .color(1f, 1f, 1f, opacity)
+                .texture(0f, 0f)
+                .next();
+
+        // 1
+        buffer.vertex(positionMatrix, p.width, 0, 0)
+                .color(1f, 1f, 1f, opacity)
+                .texture(1f, 0f)
+                .next();
+
+        // 2
+        buffer.vertex(positionMatrix, p.width, 0, p.height)
+                .color(1f, 1f, 1f, opacity)
+                .texture(1f, 1f)
+                .next();
+
+        // 3
+        buffer.vertex(positionMatrix, 0, 0, p.height)
+                .color(1f, 1f, 1f, opacity)
+                .texture(0f, 1f)
+                .next();
     }
 
     private static MatrixStack getZeroFromCamera(Camera camera) {
