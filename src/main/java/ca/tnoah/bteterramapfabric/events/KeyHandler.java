@@ -8,7 +8,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
-import ca.tnoah.BTETerraMapFabricConfig;
+import ca.tnoah.bteterramapfabric.BTETerraMapFabricConfig;
 
 @Environment(EnvType.CLIENT)
 public class KeyHandler {

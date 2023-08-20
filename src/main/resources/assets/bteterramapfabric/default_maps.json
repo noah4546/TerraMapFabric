@@ -1,0 +1,34 @@
+{
+  "global": {
+    "osm": {
+      "name": "OpenStreetMap",
+      "tileUrl": "https://{random:a,b,c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "projection": "webmercator",
+      "maxThread": 2
+    },
+    "bing_aerial": {
+      "name": "Bing Maps (Satellite)",
+      "tileUrl": "https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{u}?it=A&shading=hill",
+      "projection": "webmercator",
+      "maxThread": 2
+    },
+    "bing_plain": {
+      "name": "Bing Maps",
+      "tileUrl": "https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{u}?it=G,LC,BX,RL&shading=hill",
+      "projection": "webmercator",
+      "maxThread": 2
+    },
+    "yandex_aerial": {
+      "name": "Yandex.Maps (Satellite)",
+      "tileUrl": "https://core-sat.maps.yandex.net/tiles?l=sat&x={x}&y={y}&z={z}",
+      "projection": "worldmercator",
+      "maxThread": 2
+    },
+    "yandex_plain": {
+      "name": "Yandex.Maps",
+      "tileUrl": "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}",
+      "projection": "worldmercator",
+      "maxThread": 2
+    }
+  }
+}

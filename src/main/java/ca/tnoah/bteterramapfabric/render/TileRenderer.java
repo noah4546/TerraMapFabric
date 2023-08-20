@@ -3,6 +3,7 @@ package ca.tnoah.bteterramapfabric.render;
 import ca.tnoah.bteterramapfabric.BTETerraMapFabric;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -11,41 +12,119 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static ca.tnoah.bteterramapfabric.BTETerraMapFabric.MODID;
 
 
 public class TileRenderer {
 
-    public static void renderSingleTile(WorldRenderContext context, Plane p, int yLevel, float opacity, String tmsId) {
+    // Render
+    private final WorldRenderContext context;
+    private final Tessellator tessellator;
+    private final BufferBuilder buffer;
 
-        MatrixStack matrixStack = getZeroFromCamera(context.camera());
-        Tessellator tessellator = Tessellator.getInstance();
 
-        _renderSingleTile(tessellator, matrixStack, p, yLevel, opacity, tmsId);
+    // Config
+    private final int tileSize;
+    private final int yLevel;
+    private final float opacity;
+
+
+    // Self
+    private final List<Tile> tiles;
+
+
+    public TileRenderer(WorldRenderContext context, int tileSize, int yLevel, float opacity) {
+
+        this.context = context;
+        this.tessellator = Tessellator.getInstance();
+        this.buffer = tessellator.getBuffer();
+
+        this.tileSize = tileSize;
+        this.yLevel = yLevel;
+        this.opacity = opacity;
+
+        this.tiles = new ArrayList<>();
     }
 
-    private static void _renderSingleTile(Tessellator tessellator, MatrixStack matrixStack, Plane p, int yLevel, float opacity, String tmsId) {
-        _renderTile(matrixStack, tessellator.getBuffer(), p, opacity, yLevel);
+    public void addTile(Tile tile) {
+        this.tiles.add(tile);
+    }
 
+    public void addTiles(Tile... tiles) {
+        this.tiles.addAll(Arrays.asList(tiles));
+    }
+
+    public void addTilesAroundPlayer(ClientPlayerEntity player) {
+
+    }
+
+    public static void setupRender() {
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
-
-        if (tmsId == null)
-            RenderSystem.setShaderTexture(0, new Identifier(MODID, "icon.png"));
-
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
+    }
 
-        tessellator.draw();
-
+    public static void endRender() {
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
 
-    private static void _renderTile(MatrixStack matrixStack, BufferBuilder buffer, Plane p, float opacity, int yLevel) {
+    public void render() {
+
+       setupRender();
+
+        for (Tile tile : this.tiles)
+            renderTile(tile);
+
+        endRender();
+    }
+
+    private void renderTile(Tile tile) {
+        Coord2D coord2D = tile.getCoord2D();
+        Plane plane = new Plane(
+                coord2D.x * tileSize,
+                coord2D.z * tileSize,
+                this.tileSize
+        );
+
+        MatrixStack matrixStack = getZeroFromCamera(context.camera());
+        _renderTile(matrixStack, buffer, plane, this.opacity, this.yLevel);
+        RenderSystem.setShaderTexture(0, new Identifier(MODID, "icon.png"));
+
+        this.tessellator.draw();
+    }
+
+    public static void renderSingleTile(WorldRenderContext context, Plane p, double yLevel, float opacity, RenderCallback callback) {
+
+        MatrixStack matrixStack = getZeroFromCamera(context.camera());
+        Tessellator tessellator = Tessellator.getInstance();
+
+        _renderSingleTile(tessellator, matrixStack, p, yLevel, opacity, callback);
+    }
+
+    private static void _renderSingleTile(Tessellator tessellator, MatrixStack matrixStack, Plane p, double yLevel, float opacity, RenderCallback callback) {
+        _renderTile(matrixStack, tessellator.getBuffer(), p, opacity, yLevel);
+
+        setupRender();
+
+        callback.onSetTexture();
+
+        tessellator.draw();
+
+        endRender();
+    }
+
+    private static void _renderTile(MatrixStack matrixStack, BufferBuilder buffer, Plane p, float opacity, double yLevel) {
         matrixStack.translate(p.x, yLevel, p.z);
         Matrix4f positionMatrix = matrixStack.peek().getPositionMatrix();
+
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 
         /*
          *  i=0 -------- i=1
@@ -55,7 +134,6 @@ public class TileRenderer {
          *   |            |
          *  i=3 -------- i=2
          */
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
 
         // 0
         buffer.vertex(positionMatrix, 0, 0, 0)
@@ -64,19 +142,19 @@ public class TileRenderer {
                 .next();
 
         // 1
-        buffer.vertex(positionMatrix, p.width, 0, 0)
+        buffer.vertex(positionMatrix, (float)p.width, 0, 0)
                 .color(1f, 1f, 1f, opacity)
                 .texture(1f, 0f)
                 .next();
 
         // 2
-        buffer.vertex(positionMatrix, p.width, 0, p.height)
+        buffer.vertex(positionMatrix, (float)p.width, 0, (float)p.height)
                 .color(1f, 1f, 1f, opacity)
                 .texture(1f, 1f)
                 .next();
 
         // 3
-        buffer.vertex(positionMatrix, 0, 0, p.height)
+        buffer.vertex(positionMatrix, 0, 0, (float)p.height)
                 .color(1f, 1f, 1f, opacity)
                 .texture(0f, 1f)
                 .next();
@@ -95,166 +173,60 @@ public class TileRenderer {
     }
 
     public static class Plane {
-        private final int x;
-        private final int z;
+        private final double x;
+        private final double z;
 
-        private final int width;
-        private final int height;
+        private final double width;
+        private final double height;
 
-        public Plane(int x, int z, int width, int height) {
+        public Plane(double x, double z, double width, double height) {
             this.x = x;
             this.z = z;
             this.width = width;
             this.height = height;
         }
 
-        public Plane(int x, int z, int size) {
+        public Plane(double x, double z, double size) {
             this(x, z, size, size);
-        }
-    }
-
-    public static class XZ {
-        private final int x;
-        private final int z;
-
-        public XZ(int x, int z) {
-            this.x = x;
-            this.z = z;
-        }
-    }
-
-
-    public static class Settings {
-
-        // Location
-        private final int x;
-        private final int y;
-        private final int z;
-
-        // Size
-        private final int xSize;
-        private final int zSize;
-
-        // Other
-        private final float opacity;
-
-        public Settings(int x, int y, int z, int xSize, int zSize, float opacity) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.xSize = xSize;
-            this.zSize = zSize;
-            this.opacity = opacity;
-        }
-
-        public static Builder builder() {
-            return new Builder();
         }
 
         @Override
         public String toString() {
-            return "Settings{" +
+            return "Plane{" +
                     "x=" + x +
-                    ", y=" + y +
                     ", z=" + z +
-                    ", xSize=" + xSize +
-                    ", zSize=" + zSize +
-                    ", opacity=" + opacity +
+                    ", width=" + width +
+                    ", height=" + height +
                     '}';
         }
+    }
 
-        public static class Builder {
-            // Location
-            private int x = 0;
-            private int y = 64;
-            private int z = 0;
+    public static class Tile {
+        private final int tileX;
+        private final int tileY;
 
-            // Size
-            private int xSize = 16;
-            private int zSize = 16;
-
-            // Other
-            private float opacity = 1f;
-
-            public Builder() {
-
-            }
-
-            /**
-             * Set the origin position of the tile
-             *
-             * @param x x coord of origin [ East(+), West(-) ]
-             * @param z z coord of origin [ South(+), North(-) ]
-             * @return {@link Builder}
-             */
-            public Builder position(int x, int z) {
-                this.x = x;
-                this.z = z;
-                return this;
-            }
-
-            /**
-             * Set the y position of the tile (height)
-             *
-             * @param y y position (height)
-             * @return {@link Builder}
-             */
-            public Builder yPosition(int y) {
-                this.y = y;
-                return this;
-            }
-
-            /**
-             * Set the size of the tile
-             *
-             * @param size size in x and z direction (from origin south/east)
-             * @return {@link Builder}
-             */
-            public Builder size(int size) {
-                this.xSize = size;
-                this.zSize = size;
-                return this;
-            }
-
-            /**
-             * Set the size of the tile
-             *
-             * @param xSize x size (from origin east)
-             * @param zSize z size (from origin south)
-             * @return {@link Builder}
-             */
-            public Builder size(int xSize, int zSize) {
-                this.xSize = xSize;
-                this.zSize = zSize;
-                return this;
-            }
-
-            /**
-             * Set the opacity of the tile.
-             *
-             * @param opacity opacity (percentage 0 to 1)
-             * @return {@link Builder}
-             */
-            public Builder opacity(float opacity) {
-                if (opacity > 1 || opacity < 1) return this;
-
-                this.opacity = opacity;
-                return this;
-            }
-
-            /**
-             * Build the Settings
-             *
-             * @return {@link Settings}
-             */
-            public Settings build() {
-                return new Settings(
-                        x, y, z,
-                        xSize, zSize,
-                        opacity
-                );
-            }
+        public Tile(int tileX, int tileY) {
+            this.tileX = tileX;
+            this.tileY = tileY;
         }
+
+        public Coord2D getCoord2D() {
+            return coordFromTile(this);
+        }
+
+        public static Coord2D coordFromTile(Tile tile) {
+            return new Coord2D(tile.tileX, tile.tileY); // TODO: Convert to world coords
+        }
+
+        public static Tile tileFromCoord(Coord2D coord2D, int tileSize) {
+            return new Tile(coord2D.x / tileSize, coord2D.z / tileSize); // TODO: Convert to world coords
+        }
+    }
+
+    public record Coord2D(int x, int z) {}
+
+    public interface RenderCallback {
+        void onSetTexture();
     }
 
 }

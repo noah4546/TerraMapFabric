@@ -1,16 +1,19 @@
 package ca.tnoah.bteterramapfabric;
 
 import ca.tnoah.bteterramapfabric.events.RenderEvent;
+import ca.tnoah.bteterramapfabric.loader.ProjectionJsonLoader;
+import ca.tnoah.bteterramapfabric.loader.TMSJsonLoader;
+import ca.tnoah.bteterramapfabric.projection.Proj4jProjection;
+import ca.tnoah.bteterramapfabric.render.RenderSettings;
 import ca.tnoah.bteterramapfabric.render.TileRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -23,10 +26,15 @@ import org.slf4j.LoggerFactory;
 
 import ca.tnoah.bteterramapfabric.events.KeyHandler;
 
+import static ca.tnoah.bteterramapfabric.BTETerraMapFabricConfig.mapServiceCategory;
+import static ca.tnoah.bteterramapfabric.BTETerraMapFabricConfig.mapServiceId;
+
 public class BTETerraMapFabric implements ModInitializer {
 
 	public static final String MODID = "bteterramapfabric";
 	public static final String NAME = "BTE Terra Map Fabric";
+
+	public static final RenderSettings RENDER_SETTINGS = new RenderSettings();
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -44,10 +52,10 @@ public class BTETerraMapFabric implements ModInitializer {
 		try {
 			String modConfigDir = FabricLoader.getInstance().getConfigDir().toString();
 			LOGGER.info(modConfigDir);
-			//ProjectionYamlLoader.INSTANCE.refresh(modConfigDir);
-			//TMSYamlLoader.INSTANCE.refresh(modConfigDir);
+			ProjectionJsonLoader.INSTANCE.refresh(modConfigDir);
+			TMSJsonLoader.INSTANCE.refresh(modConfigDir);
 		} catch (Exception e) {
-			LOGGER.error("Error caught while parsing map yaml files!");
+			LOGGER.error("Error caught while parsing map json files!");
 			LOGGER.error(e.getMessage());
 			throw new RuntimeException(e);
 		}
@@ -56,11 +64,22 @@ public class BTETerraMapFabric implements ModInitializer {
 		KeyHandler.initializeKeys();
 		KeyHandler.initializeKeyEvents();
 
-		WorldRenderEvents.START.register(RenderEvent::onRenderEvent);
+		//WorldRenderEvents.START.register(RenderEvent::onRenderEvent);
+		WorldRenderEvents.END.register(RenderEvent::onRenderEvent);
 
-		WorldRenderEvents.END.register(context -> {
-			TileRenderer.renderSingleTile(context, new TileRenderer.Plane(0, 0, 16), 64, 0.5f, null);
-		});
+		/*WorldRenderEvents.END.register(context -> {
+
+			//ClientPlayerEntity player = MinecraftClient.getInstance().player;
+
+			TileRenderer tileRenderer = new TileRenderer(context, 16, 64, 0.5f);
+			tileRenderer.addTiles(
+					new TileRenderer.Tile(0, 0),
+					new TileRenderer.Tile(0, 1),
+					new TileRenderer.Tile(0, 2)
+			);
+			//tileRenderer.addTilesAroundPlayer(player);
+			tileRenderer.render();
+		});*/
 	}
 
 	private void test(WorldRenderContext context) {
@@ -97,6 +116,7 @@ public class BTETerraMapFabric implements ModInitializer {
 	}
 
 	static {
-		//Proj4jProjection.registerProjection();
+
+		Proj4jProjection.registerProjection();
 	}
 }

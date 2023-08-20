@@ -1,17 +1,14 @@
 package ca.tnoah.bteterramapfabric.gui;
 
-import ca.tnoah.BTETerraMapFabricConfig;
+import ca.tnoah.bteterramapfabric.BTETerraMapFabricConfig;
 import ca.tnoah.bteterramapfabric.gui.custom.BooleanButton;
 import ca.tnoah.bteterramapfabric.gui.custom.Slider;
-import ca.tnoah.bteterramapfabric.gui.custom.SplitWidget;
 import ca.tnoah.bteterramapfabric.gui.custom.TextFieldWithLabel;
 import ca.tnoah.bteterramapfabric.gui.sidebar.Sidebar;
 import ca.tnoah.bteterramapfabric.gui.sidebar.SidebarSide;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
 
